@@ -1,5 +1,5 @@
 {
-  "name": "mern-project-template",
+  "name": "hoot",
   "version": "1.0.0",
   "scripts": {
     "start": "node ./backend/server.js",
