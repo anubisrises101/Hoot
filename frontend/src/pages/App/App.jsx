@@ -1,4 +1,4 @@
-import { useState, createContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { getUser } from "../../services/authService";
 import "./App.css";
@@ -22,6 +22,23 @@ function App() {
     navigate("/hoots");
   };
 
+  const handleDeleteHoot = async (hootId) => {
+    // Call upon the service function:
+    const deletedHoot = await hootService.deleteHoot(hootId);
+    // Filter state using deletedHoot._id:
+    setHoots(hoots.filter((hoot) => hoot._id !== deletedHoot._id));
+    // Redirect the user:
+    navigate('/hoots');
+  };
+
+  const handleUpdateHoot = async (hootId, hootFormData) => {
+    const updatedHoot = await hootService.update(hootId, hootFormData);
+
+    setHoots(hoots.map((hoot) => (hootId === hoot._id ? updatedHoot : hoot)));
+
+    navigate(`/hoots/${hootId}`);
+  };
+
   useEffect(() => {
     const fetchAllHoots = async () => {
       const hootsData = await hootService.index();
@@ -38,11 +55,24 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/hoots" element={<HootListPage hoots={hoots} />} />
-            <Route path="/hoots/:hootId" element={<HootDetailsPage />} />
             <Route
               path="/hoots/new"
               element={<NewHootPage handleAddHoot={handleAddHoot} />}
             />
+            <Route
+              path="/hoots/:hootId/edit"
+              element={<NewHootPage handleUpdateHoot={handleUpdateHoot} />}
+            />
+            <Route
+              path="/hoots/:hootId"
+              element={
+                <HootDetailsPage
+                  user={user}
+                  handleDeleteHoot={handleDeleteHoot}
+                />
+              }
+            />
+            
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         ) : (
